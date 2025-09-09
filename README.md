@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 天气预报应用 (Next.js + MUI)
 
-## Getting Started
+基于 Next.js App Router + MUI + OpenWeather API 的城市天气查询示例（已精简：移除未用状态 store、SVG 资源与 Tailwind 相关配置）。
 
-First, run the development server:
+### 功能概览
+- 城市搜索与跳转 `/weather/[city]`
+- 服务端代理 OpenWeather (`/api/weather`)
+- MUI 主题 & 全局样式
+- 简单缓存策略（上游 5 分钟 revalidate，客户端 60s）
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 快速开始
+1. 复制 `.env.example` → `.env.local` 并设置：
+	```
+	OPENWEATHER_API_KEY=你的Key
+	```
+2. 安装 & 启动：
+	```bash
+	pnpm install
+	pnpm dev
+	```
+3. 访问 http://localhost:3000 （自动跳转到 /weather）
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### API 示例
+`GET /api/weather?city=beijing` 返回：`city, temperature, humidity, description, icon`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 部署提示
+- 在 Vercel/服务器配置 `OPENWEATHER_API_KEY`
+- 不要提交 `.env.local`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 目录与文件作用
+根目录：
+- package.json: 脚本与依赖
+- tsconfig.json: TypeScript 配置
+- eslint.config.mjs: ESLint 规则
+- next.config.ts: Next.js 配置占位
+- .gitignore: 忽略规则（包含 .env*）
 
-## Learn More
+public/: (已清空未用 SVG，可按需放置 favicon 等资源)
 
-To learn more about Next.js, take a look at the following resources:
+src/app/
+- layout.tsx: 全局 html/body + MUI Provider + metadata
+- globals.scss: 全局基础样式
+- page.tsx: 根路径重定向到 /weather
+- api/weather/route.ts: 服务端 API 代理 OpenWeather
+- weather/page.tsx: 搜索入口页面
+- weather/[city]/page.tsx: 动态城市详情（客户端 fetch）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+src/providers/
+- MuiProvider.tsx: 封装 MUI 主题与缓存 Provider
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+（已删除）src/store/useWeatherStore.ts: 未实际使用的 Zustand store
+（已删除）public/*.svg: 未引用静态图标
+（已删除）FILES.md: 说明合并进 README
 
-## Deploy on Vercel
+### 可扩展方向（后续可加）
+- 5 日 / 小时预报
+- 缓存与离线（Redis / Edge）
+- 国际化 (i18n)
+- 错误与 Loading 组件
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+本仓库演示最小功能，可按需继续扩展。
